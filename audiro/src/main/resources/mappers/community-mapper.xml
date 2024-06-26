@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.audiro.repository.PostDao">
+
+    <!-- 화면에 인기여행지 top5개(찜많은순) 
+    <select id="selectPopularTravelDestinations5" resultType="">
+        select destination_id, count(*) count
+        from favorite_destination
+        group by destination_id
+        order by count DESC,
+        destination_id ASC
+        fetch first 5 rows only
+    </select> -->
+    <!-- TODO: 위에서 인기여행지 id 뽑은걸로 여행지 테이블의 정보 필요함(화면에 제목+사진보여주어야됨) 
+        인기 여행지 클릭했을 때 인기 여행지 상세보기는 리다이렉트 써서 destination_id에 해당하는 상세보기 페이지로 이동
+     -->
+<!--    <select id="selectPopular" resultType="">
+        SELECT
+        f.destination_id,
+        t.name,
+        t.img_url,
+        COUNT(*) AS count
+        FROM
+        favorite_destination f
+        JOIN
+        travel_destination t ON f.destination_id = t.travel_destination_id
+        GROUP BY
+        f.destination_id, t.name, t.img_url
+        ORDER BY
+        count DESC,
+        f.destination_id ASC
+        FETCH FIRST 5 ROWS ONLY;
+    </select>
+    -->
+    
+    <!-- 인기 여행지 top5에서 찜 누르면 찜 여행지에 insert 
+    <insert id="insertFavoriteDestinations">
+        INSERT INTO favorite_destination (users_id, destination_id) 
+        VALUES (#{usersId}, #{destinationId})
+    </insert>
+    -->
+    
+    <!-- 통합 게시판 목록 select 최신순으로 가져옴 
+    <select id="selectEntireOrderByCreateTimeDesc" resultType="Post">
+        select p.*, u.nickname 
+        from post p, users u 
+        where p.users_id = u.users_id
+        and (p.post_type_id = 20 or p.post_type_id = 30)
+        order by p.created_time desc
+    </select>
+    -->
+    
+    <!-- 통합 게시판 목록 select 인기순으로 가져옴 
+    <select id="selectEntireOrderByGoodDesc" resultType="Post">
+        select p.*, u.nickname 
+        from post p, users u 
+        where p.users_id = u.users_id
+        and (p.post_type_id = 20 or p.post_type_id = 30)
+        order by p.good desc
+    </select>
+    
+    -->
+    
+    <!-- 여행메이트 게시판 목록 select 최신순으로 가져옴 
+    <select id="selectMateOrderByCreateTimeDesc" resultType="Post">
+        select p.*, u.nickname 
+        from post p, users u 
+        where p.users_id = u.users_id
+        and p.post_type_id = 20
+        order by p.created_time desc
+    </select>
+    
+    -->
+    
+    <!-- 여행메이트 게시판 목록 select 인기순으로 가져옴 -->
+        <!-- 여행메이트 게시판 목록 select 최신순으로 가져옴 
+    <select id="selectMateOrderByGoodDesc" resultType="Post">
+        select p.*, u.nickname 
+        from post p, users u 
+        where p.users_id = u.users_id
+        and p.post_type_id = 20
+        order by p.good desc
+    </select>
+    -->
+    
+    <!-- 자유 게시판 목록 select 최신순으로 가져옴 
+    <select id="selectFreeOrderByCreateTimeDesc" resultType="Post">
+        select p.*, u.nickname 
+        from post p, users u 
+        where p.users_id = u.users_id
+        and p.post_type_id = 30
+        order by p.created_time desc
+    </select>
+    -->
+    
+    <!-- 자유 게시판 목록 select 인기순으로 가져옴 
+    <select id="selectFreeOrderByGoodDesc" resultType="Post">
+        select p.*, u.nickname 
+        from post p, users u 
+        where p.users_id = u.users_id
+        and p.post_type_id = 30
+        order by p.good desc
+    </select>
+    -->
+    
+
+        
+    <!--(자유+여행메이트 글쓰면) post테이블에 insert하는 문장 
+    <insert id="insertFreeAndMate">
+        insert into post (users_id, post_type_id, title, content)
+        values (#{usersId}, #{postTypeId}, #{title}, #{content})
+    </insert>
+    -->
+    
+    <!-- 사용자가 good버튼 누르면 good 증가 
+    update.where조건 그 테이블의 pk로 하기. 그래야 딱 1행만 나와서 변경가능함 
+    <update id="updatePostGood">
+        update post set good = good + 1
+        where post_id = #{postId}
+    </update>
+    -->
+
+    <!-- 자유+여행메이트 상세 페이지 select
+    <select id="" resultType=""></select>
+     -->
+     
+    <!-- post테이블에서 수정(update)하는 문장 
+    <update id="updateFreeAndMate">
+        update post
+        set post_type_id = #{postTypeId},
+        title = #{title},
+        content = #{content},
+        modified_time = systimestamp
+        where post_id = #{postId}
+    </update>
+    -->
+    
+    <!-- 상세보기 select
+    <select id="selectDetailsFreeAndMate" resultType="Post">
+        select * from post where post_id = #{postId} and post_type_id = #{postTypeId}
+    </select>
+    -->
+
+
+    <!-- 검색 창 -->
+    <!-- post 테이블에서 제목/내용/작성자로 검색하기 기능 
+    <select id="search" resultType="Post">
+        <bind name="searchKeyword" value="'%' + keyword + '%'" />
+        SELECT p.*, u.nickname
+        FROM post p
+        JOIN users u ON p.users_id = u.users_id
+        <where>
+            <choose>
+                <when test='category.equals("t")'>
+                    upper(p.title) LIKE upper(#{searchKeyword})
+                </when>
+                <when test='category.equals("c")'>
+                    upper(p.content) LIKE upper(#{searchKeyword})
+                </when>
+                <when test='category.equals("tc")'>
+                    (upper(p.title) LIKE upper(#{searchKeyword})
+                    OR upper(p.content) LIKE upper(#{searchKeyword}))
+                </when>
+                <when test='category.equals("a")'>
+                    upper(u.nickname) LIKE upper(#{searchKeyword})
+                </when>
+            </choose>
+        </where>
+        ORDER BY p.post_id DESC
+    </select>
+    -->
+    
+</mapper>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.audiro.repository.ProfileDao">
+   
+   <!-- 프로필 생성(insert)sql문 회원가입 시 같이 호출해서 생성함.
+   (users테이블의 users_id(pk)를 select해와서 insert해야함 -->
+    <insert id="insertProfileByUsersId">
+        insert into profile (users_id)
+        values (#{users_id})
+    </insert>
+
+
+</mapper>
